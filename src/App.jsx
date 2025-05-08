@@ -8,6 +8,8 @@ import { ToastContainer } from 'react-toastify';
 const Home = lazy(() => import('./pages/Home'))
 const AddEmploy = lazy(() => import('./pages/AddEmploy'))
 const Update = lazy(() => import('./pages/Update'))
+const AuthPage = lazy(() => import('./pages/AuthPage'))
+const ErrorPage = lazy(() => import('./pages/ErrorPage'))
 
 const App = () => {
   return (
@@ -17,7 +19,9 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/add' element={<AddEmploy />} />
-          <Route path='/update' element={<Update />} />
+          <Route path='/update/:id' element={<Update />} />
+          <Route path='/login' element={<AuthPage />} />
+          <Route path='*' element={<ErrorPage />} />
         </Routes>
       </Suspense>
     </div>
