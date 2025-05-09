@@ -1,9 +1,14 @@
-import React from 'react'
+import React from 'react';
+
+import EmployUpdateForm from '../components/EmployUpdateForm';
 
 const Update = () => {
-    return (
-        <div>Update</div>
-    )
-}
 
-export default Update
+    return (
+        <div>
+            <EmployUpdateForm />
+        </div>
+    );
+};
+
+export default Update;

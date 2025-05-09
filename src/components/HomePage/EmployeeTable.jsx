@@ -1,83 +1,188 @@
-import React, { useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
-import { getAllEmployees } from '../../Apis/Employ'
-import Pagination from './Pagination'
+
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { deleteEmploy, getAllEmployees, searchEmployees } from '../../Apis/Employ';
+import { useNavigate } from 'react-router-dom';
+import ConfirmDeleteModal from '../ConfirmDeleteModal';
+import DataTable from 'react-data-table-component';
 
 const EmployeeTable = ({ setLoading }) => {
-    const [employees, setEmployees] = useState([])
+    const [remove, setRemove] = useState(false);
+    const [deleteData, setDeleteData] = useState();
+    const navigate = useNavigate();
+    const [employees, setEmployees] = useState([]);
+    const [filteredEmployees, setFilteredEmployees] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [minSalary, setMinSalary] = useState('');
+    const [maxSalary, setMaxSalary] = useState('');
+
+    const fetchAllEmployees = async () => {
+        try {
+            const { data } = await getAllEmployees();
+            setEmployees(data);
+            setFilteredEmployees(data);
+        } catch (error) {
+            console.log(error, 'getting data failed');
+            toast.error(error.response?.data?.message || "Error fetching data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchAllEmployees = async () => {
-            try {
-                const { data } = await getAllEmployees()
-                console.log(data, '------------------ett')
-                setEmployees(data)
-            } catch (error) {
-                console.log(error, 'getting data failed');
-                toast.error(error.response?.data?.message || "Error fetching data")
-            } finally {
-                setLoading(false)
-            }
+        fetchAllEmployees();
+    }, []);
+
+    const handleEdit = (id) => {
+        navigate(`/update/${id}`);
+    };
+
+    const handleDelete = (data) => {
+        setRemove(true);
+        setDeleteData(data);
+    };
+
+    const handleRemove = async (id) => {
+        try {
+            await deleteEmploy(id);
+            fetchAllEmployees();
+            toast.success("Deleted");
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.log(error, 'Deleting failed');
         }
-        fetchAllEmployees()
-    }, [])
+        setRemove(false);
+    };
+
+    const handleClose = (e) => {
+        if (e.target.id === "container") {
+            setRemove(false);
+        }
+    };
+
+    const fetchFilteredEmployees = async () => {
+        try {
+            const paramsData = {
+                search: searchTerm,
+                minSalary: minSalary || undefined,
+                maxSalary: maxSalary || undefined,
+            };
+            console.log(paramsData, '------------paramsData')
+            const { data } = await searchEmployees(paramsData);
+            console.log(data, '---------------data')
+            setFilteredEmployees(data);
+        } catch (error) {
+            console.error("Error fetching filtered employees:", error);
+            toast.error(error.response?.data?.message || "Failed to fetch data");
+        }
+    };
+
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            fetchFilteredEmployees();
+        }, 500); // debounce delay
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchTerm, minSalary, maxSalary]);
+
+    const columns = [
+        { name: "No", selector: (_, index) => index + 1, width: "50px" },
+        { name: "Name", selector: (employee) => employee.name, sortable: true },
+        { name: "Email", selector: (employee) => employee.email },
+        { name: "Phone", selector: (employee) => employee.phoneNumber },
+        { name: "Address", selector: (employee) => employee.address },
+        { name: "Position", selector: (employee) => employee.position },
+        { name: "Joining Date", selector: (employee) => employee.joiningDate },
+        { name: "Added By", selector: (employee) => employee.createdBy },
+        {
+            name: "Updated By",
+            selector: (employee) => (
+                <div className="flex space-x-2">
+                    {employee.updatedBy?.map((user, index) => (
+                        <span key={index}>{user}</span>
+                    ))}
+                </div>
+            ),
+        },
+        { name: "Salary", selector: (employee) => employee.salary },
+        {
+            name: "Options",
+            cell: row => (
+                <div className="flex flex-col space-x-2 gap-2 p-2">
+                    <button
+                        onClick={() => handleEdit(row.id)}
+                        className="bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded text-sm w-full"
+                    >
+                        Update
+                    </button>
+                    <button
+                        onClick={() => handleDelete(row)}
+                        className="bg-red-600 hover:bg-red-800 text-white px-3 py-1 rounded text-sm"
+                    >
+                        Delete
+                    </button>
+                </div>
+            ),
+        },
+    ];
+
     return (
         <>
-            <div className="overflow-x-auto w-full max-w-7xl">
-                <table className="min-w-full divide-y divide-gray-200 shadow-md rounded-lg overflow-hidden bg-white">
-                    <thead className="bg-blue-50">
-                        <tr>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-12">No</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-32">Name</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-48">Email</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-32">Phone</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-64">Address</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-40">Position</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-32">Joining Date</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-32">Added By</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-32">Updated By</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-24">Salary</th>
-                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 w-32">Options</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {employees.length === 0 ? (
-                            <tr>
-                                <td colSpan="6" className="text-center py-4 text-gray-600">No employees available</td>
-                            </tr>
-                        ) : (
-                            employees.map((employee, i) => (
-                                <tr key={employee.id} className="hover:bg-gray-50 transition">
-                                    <td className="px-4 py-3">{i + 1}</td>
-                                    <td className="px-4 py-3">{employee.name}</td>
-                                    <td className="px-4 py-3">{employee.email}</td>
-                                    <td className="px-4 py-3">{employee.phoneNumber}</td>
-                                    <td className="px-4 py-3">{employee.address}</td>
-                                    <td className="px-4 py-3">{employee.position}</td>
-                                    <td className="px-4 py-3">{employee.joiningDate}</td>
-                                    <td className="px-4 py-3">{employee.createdBy}</td>
-                                    <td className="px-4 py-3">{employee.updatedBy}</td>
-                                    <td className="px-4 py-3">{employee.salary}</td>
-                                    <td className="px-4 py-3 space-x-2">
-                                        <div className='flex space-x-2'>
-                                            <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded transition">
-                                                Update
-                                            </button>
-                                            <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded transition">
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+            <div className="mb-4 flex flex-wrap gap-4 items-center w-full justify-end  max-w-7xl">
+                <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search employees..."
+                    className="px-4 py-2 border rounded-md w-64"
+                />
+                <input
+                    type="number"
+                    value={minSalary}
+                    onChange={(e) => setMinSalary(e.target.value)}
+                    placeholder="Min Salary"
+                    className="px-4 py-2 border rounded-md w-40"
+                />
+                <input
+                    type="number"
+                    value={maxSalary}
+                    onChange={(e) => setMaxSalary(e.target.value)}
+                    placeholder="Max Salary"
+                    className="px-4 py-2 border rounded-md w-40"
+                />
             </div>
 
-            <Pagination />
-        </>
-    )
-}
+            <div className="overflow-x-auto w-full max-w-7xl">
+                <DataTable
+                    columns={columns}
+                    data={filteredEmployees}
+                    pagination
+                    highlightOnHover
+                    responsive
+                    paginationPerPage={10}
+                    paginationRowsPerPageOptions={[5, 10, 15, 20]}
+                    customStyles={{
+                        headCells: {
+                            style: {
+                                backgroundColor: '#4B5563',
+                                color: 'white',
+                                fontWeight: 'bold'
+                            }
+                        }
+                    }}
+                />
+            </div>
 
-export default EmployeeTable
+            {remove && (
+                <ConfirmDeleteModal
+                    remove={remove}
+                    setRemove={setRemove}
+                    deleteData={deleteData}
+                    handleRemove={handleRemove}
+                />
+            )}
+        </>
+    );
+};
+
+export default EmployeeTable;

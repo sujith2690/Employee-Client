@@ -18,6 +18,8 @@ export const EmployeeSchema = Yup.object().shape({
     salary: Yup.number()
         .typeError('Salary must be a number')
         .positive('Salary must be greater than zero')
+        .min(20000, 'Salary must be at least ₹20,000')
+        .max(8900000, 'Salary must not exceed ₹8,900,000')
         .required('Salary is required'),
     joiningDate: Yup.date()
         .required('Joining Date is required')

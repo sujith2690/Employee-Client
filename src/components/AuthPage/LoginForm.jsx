@@ -26,7 +26,8 @@ const LoginForm = ({ handleLogin }) => {
             try {
                 console.log(values, 'login values')
                 const { data } = await logInApi(values)
-                localStorage.setItem("token", data.Token);
+                console.log(data,'-------------------login data')
+                localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 toast.success(data.message)
                 navigate('/')
