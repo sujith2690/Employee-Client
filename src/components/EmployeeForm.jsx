@@ -96,7 +96,6 @@ const EmployeeForm = () => {
                             );
                         }
 
-                        // Group fields in pairs (e.g., name & email, phone & joiningDate, etc.)
                         return (
                             <div key={field}>
                                 <label className="block text-gray-700 font-medium mb-1 capitalize" htmlFor={field}>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getEmployDetails, updateEmployDetails } from '../Apis/Employ';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import { EmployeeSchema } from '../validation/employeeSchema'; // ensure this schema is defined properly
 import { toast } from 'react-toastify'; // Optional: if using toast for notifications
 
@@ -24,7 +23,11 @@ const EmployUpdateForm = () => {
         const fetchEmployeeDetails = async () => {
             try {
                 const { data } = await getEmployDetails(id);
-                setInitialValues(data);
+                const formattedData = {
+                    ...data,
+                    joiningDate: new Date(data.joiningDate).toISOString().split('T')[0], // ➜ "yyyy-MM-dd"
+                };
+                setInitialValues(formattedData);
             } catch (error) {
                 console.error('Error fetching employee details:', error);
             }
@@ -133,6 +136,20 @@ const EmployUpdateForm = () => {
                         />
                         {touched.joiningDate && errors.joiningDate && (
                             <p className="text-red-500 text-sm">{errors.joiningDate}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-gray-700 mb-1">Position</label>
+                        <input
+                            type="text"
+                            name="position"
+                            value={values.position}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className="w-full px-4 py-2 border rounded-md focus:outline-none"
+                        />
+                        {touched.position && errors.position && (
+                            <p className="text-red-500 text-sm">{errors.position}</p>
                         )}
                     </div>
 

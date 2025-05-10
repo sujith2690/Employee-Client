@@ -19,15 +19,18 @@ const EmployeeTable = ({ setLoading }) => {
     const fetchAllEmployees = async () => {
         try {
             const { data } = await getAllEmployees();
-            setEmployees(data);
-            setFilteredEmployees(data);
+            console.log(data.details, '------------------all employee')
+            setEmployees(data.details);
+            setFilteredEmployees(data.details);
+            setLoading(false);
         } catch (error) {
             console.log(error, 'getting data failed');
             toast.error(error.response?.data?.message || "Error fetching data");
         } finally {
-            setLoading(false);
+            setLoading(false); // End loading
         }
     };
+
 
     useEffect(() => {
         fetchAllEmployees();
@@ -73,7 +76,7 @@ const EmployeeTable = ({ setLoading }) => {
             setFilteredEmployees(data);
         } catch (error) {
             console.error("Error fetching filtered employees:", error);
-            toast.error(error.response?.data?.message || "Failed to fetch data");
+            // toast.error(error.response?.data?.message || "Failed to fetch data");
         }
     };
 
@@ -96,13 +99,32 @@ const EmployeeTable = ({ setLoading }) => {
         { name: "Added By", selector: (employee) => employee.createdBy },
         {
             name: "Updated By",
-            selector: (employee) => (
-                <div className="flex space-x-2">
-                    {employee.updatedBy?.map((user, index) => (
-                        <span key={index}>{user}</span>
-                    ))}
-                </div>
-            ),
+            selector: (employee) => {
+                let updatedByList = [];
+                try {
+                    // Parse the string to JSON
+                    const parsed = JSON.parse(employee.updatedBy);
+                    if (Array.isArray(parsed)) {
+                        updatedByList = parsed;
+                    }
+                } catch (err) {
+                    // If parsing fails, use an empty array
+                    updatedByList = [];
+                }
+
+                return (
+                    <div className="flex space-x-2 flex-wrap">
+                        {updatedByList.map((user, index) => (
+                            <span
+                                key={index}
+                                className="bg-gray-200 px-2 py-1 rounded text-xs text-gray-800"
+                            >
+                                {user}
+                            </span>
+                        ))}
+                    </div>
+                );
+            },
         },
         { name: "Salary", selector: (employee) => employee.salary },
         {
@@ -125,6 +147,7 @@ const EmployeeTable = ({ setLoading }) => {
             ),
         },
     ];
+
 
     return (
         <>
