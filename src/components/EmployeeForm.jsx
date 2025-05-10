@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { EmployeeSchema } from '../validation/employeeSchema';
 import { useNavigate } from 'react-router-dom';
-import { sendEmployDetails } from '../Apis/Employ';
+import { sendEmployDetails } from '../Apis/employApis';
 import { toast } from 'react-toastify';
 
 const EmployeeForm = () => {

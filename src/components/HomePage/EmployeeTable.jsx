@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { deleteEmploy, getAllEmployees, searchEmployees } from '../../Apis/Employ';
+import { deleteEmploy, getAllEmployees, searchEmployees } from '../../Apis/employApis';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDeleteModal from '../ConfirmDeleteModal';
 import DataTable from 'react-data-table-component';

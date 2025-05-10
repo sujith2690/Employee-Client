@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getEmployDetails, updateEmployDetails } from '../Apis/Employ';
+import { getEmployDetails, updateEmployDetails } from '../Apis/employApis';
 import { useFormik } from 'formik';
 import { EmployeeSchema } from '../validation/employeeSchema'; // ensure this schema is defined properly
 import { toast } from 'react-toastify'; // Optional: if using toast for notifications
