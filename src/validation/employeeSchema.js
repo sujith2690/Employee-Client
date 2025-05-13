@@ -8,10 +8,7 @@ export const EmployeeSchema = Yup.object().shape({
         .email('Invalid email format')
         .required('Email is required'),
     phoneNumber: Yup.string()
-        .matches(
-            /^(\+?[0-9]{1,4}[\s-])?(\(?\d{1,3}\)?[\s-])?[\d\s-]{5,10}$/,
-            'Phone number is not valid'
-        )
+        .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits')
         .required('Phone number is required'),
     address: Yup.string().required('Address is required'),
     position: Yup.string().required('Position is required'),

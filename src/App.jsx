@@ -18,10 +18,10 @@ const App = () => {
       <Suspense fallback={<Loading />}>
         <ToastContainer />
         <Routes>
+          <Route path='/login' element={<AuthPage />} />
           <Route path="/" element={<ProtectedRoute  element={< Home />} />} />
           <Route path="/add" element={<ProtectedRoute  element={< AddEmploy />} />} />
           <Route path="/update/:id" element={<ProtectedRoute  element={< Update />} />} />
-          <Route path='/login' element={<AuthPage />} />
           <Route path='*' element={<ErrorPage />} />
         </Routes>
       </Suspense>
