@@ -7,7 +7,7 @@ const ProtectedRoute = ({ element }) => {
     const token = localStorage.getItem('token');
 
     if (!user || !token) {
-        toast.error('Please login');
+        // toast.error('Please login');
         return <Navigate to="/login" replace />;
     }
 
